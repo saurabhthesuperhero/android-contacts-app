@@ -3,6 +3,7 @@ package com.example.contactsapp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,7 +24,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private ArrayList<ContactsModel> contactsModalArrayList;
     private RecyclerView contactRV;
-    private ContactRVAdapter contactRVAdapter;
+    public ContactRVAdapter contactRVAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,34 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("Range")
     private void getContacts() {
-        String contactId = "";
-        String displayName = "";
-        String company = "";
-        String email = "";
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-        if (cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                @SuppressLint("Range") int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-                if (hasPhoneNumber > 0) {
-                    contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                    displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    Cursor phoneCursor = getContentResolver().query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{contactId},
-                            null);
-                    if (phoneCursor.moveToNext()) {
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        company = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Organization.COMPANY));
-                        email = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
-                        contactsModalArrayList.add(new ContactsModel(displayName, phoneNumber,company,email));
-                    }
-                    phoneCursor.close();
-                }
-            }
-        }
-        cursor.close();
+        contactsModalArrayList= ContactUtil.INSTANCE.getAllContactsoldie(this);
+        TextView textView=findViewById(R.id.textView);
+        textView.setText("Total Contacts: "+contactsModalArrayList.size());
+        Log.e("checkme", "getContacts: "+contactsModalArrayList.size() );
+        contactRVAdapter.setData(contactsModalArrayList);
         contactRVAdapter.notifyDataSetChanged();
     }
 }

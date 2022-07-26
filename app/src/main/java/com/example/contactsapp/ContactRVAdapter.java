@@ -17,7 +17,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
 
-class ContactRVAdapter extends RecyclerView.Adapter<ContactRVAdapter.ViewHolder> {
+public class ContactRVAdapter extends RecyclerView.Adapter<ContactRVAdapter.ViewHolder> {
 
     // creating variables for context and array list.
     private Context context;
@@ -28,11 +28,15 @@ class ContactRVAdapter extends RecyclerView.Adapter<ContactRVAdapter.ViewHolder>
         this.context = context;
         this.contactsModalArrayList = contactsModalArrayList;
     }
+    public void  setData( ArrayList<ContactsModel> contactsModalArrayList){
+        this.contactsModalArrayList.clear();
+        this.contactsModalArrayList=contactsModalArrayList;
+    }
 
     @NonNull
     @Override
     public ContactRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ContactRVAdapter.ViewHolder(LayoutInflater.from(context).inflate(R.layout.contacts_rv_item, parent, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.contacts_rv_item, parent, false));
 
     }
 
@@ -44,7 +48,7 @@ class ContactRVAdapter extends RecyclerView.Adapter<ContactRVAdapter.ViewHolder>
     @Override
     public void onBindViewHolder(@NonNull ContactRVAdapter.ViewHolder holder, int position) {
         ContactsModel modal = contactsModalArrayList.get(position);
-        holder.contactTV.setText(modal.getUserName());
+        holder.contactTV.setText(modal.getUserName()+": "+modal.getContactNumber());
         ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
         int color = generator.getRandomColor();
         String lol= (modal.getUserName().substring(0, 1));
@@ -60,10 +64,11 @@ class ContactRVAdapter extends RecyclerView.Adapter<ContactRVAdapter.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return contactsModalArrayList.size();
+        if (contactsModalArrayList==null) return  0;
+        else return contactsModalArrayList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView contactIV;
         private TextView contactTV;
 
